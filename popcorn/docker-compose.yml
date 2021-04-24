@@ -3,11 +3,25 @@
 version: '3.4'
 
 services:
+  db:
+    image: "mcr.microsoft.com/mssql/server"
+    environment:
+      SA_PASSWORD: "<YourNewStrong@Passw0rd>"
+      ACCEPT_EULA: "Y"
+    ports: 
+      - 1433:1433 
+    volumes: 
+        - .\db\data:/var/opt/mssql/data
   popcorn:
     image: popcorn
     build:
       context: .
       dockerfile: ./Dockerfile
+    environment: 
+      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_ENVIRONMENT=Docker
     ports:
-      - 5000
-      - 5001
+      - 5000:5000
+      - 5001:5000
+    depends_on: 
+      - db
