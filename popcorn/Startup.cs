@@ -11,6 +11,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using popcorn.Configuration;
+using popcorn.Data;
+using popcorn.Repositories;
+using popcorn.Services;
 
 namespace popcorn
 {
@@ -26,8 +30,21 @@ namespace popcorn
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ConnectionStrings>(Configuration.GetSection("ConnectionStrings"));
+
+            services.AddDbContext<MovieContext>();
 
             services.AddControllers();
+
+            services.AddTransient<IMovieContext, MovieContext>();
+
+            services.AddTransient<IActorRepository, ActorRepository>();
+            services.AddTransient<IMovieRepository, MovieRepository>();
+            services.AddTransient<ITorrentRepository, TorrentRepository>();
+
+            services.AddTransient<IMovieService, MovieService>();
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "popcorn", Version = "v1" });
