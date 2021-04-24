@@ -4,23 +4,38 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using popcorn.Models;
 using popcorn.Services;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace popcorn.Controllers
 {
+
+    [ApiController]
+    [Route("api")]
     public class MovieController : ControllerBase
     {
         private IMovieService _movieService;
-        public MovieController(IMovieService movieService)
+        private IMemoryCache _cache;
+        public MovieController(IMovieService movieService, IMemoryCache cache)
         {
             _movieService = movieService;
+            _cache = cache;
         }
 
         #region Actor
         [HttpGet]
         [Route("/actor")]
+        [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
         public async Task<List<Actor>> GetActor()
         {
-            return await _movieService.GetActors();
+            List<Actor> actors;
+            _cache.TryGetValue<List<Actor>>("actors", out actors);
+
+            if (actors == null)
+            {
+                actors = await _movieService.GetActors();
+                _cache.Set<List<Actor>>("actors", actors, DateTime.Now.AddSeconds(10));
+            }
+            return actors;
         }
 
         [HttpGet]
