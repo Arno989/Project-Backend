@@ -2,21 +2,38 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using popcorn.DTO;
 using popcorn.Models;
 using popcorn.Services;
 using Microsoft.Extensions.Caching.Memory;
 
+/* TODO
+
+Add caching to all GET endpoints
+Fix n:n relations
+Add testing
+Add Api security
+Add logging?
+
+*/
+
+
+
 namespace popcorn.Controllers
 {
-
     [ApiController]
     [Route("api")]
     public class MovieController : ControllerBase
     {
-        private IMovieService _movieService;
-        private IMemoryCache _cache;
-        public MovieController(IMovieService movieService, IMemoryCache cache)
+        private readonly IMovieService _movieService;
+        private readonly IMemoryCache _cache;
+        private readonly ILogger<MovieController> _logger;
+
+        
+        public MovieController(ILogger<MovieController> logger, IMovieService movieService, IMemoryCache cache)
         {
+            _logger = logger;
             _movieService = movieService;
             _cache = cache;
         }
@@ -25,33 +42,48 @@ namespace popcorn.Controllers
         [HttpGet]
         [Route("/actor")]
         [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
-        public async Task<List<Actor>> GetActor()
+        public async Task<ActionResult<List<ActorDTO>>> GetActor()
         {
-            List<Actor> actors;
-            _cache.TryGetValue<List<Actor>>("actors", out actors);
-
-            if (actors == null)
+            try
             {
-                actors = await _movieService.GetActors();
-                _cache.Set<List<Actor>>("actors", actors, DateTime.Now.AddSeconds(10));
+                List<ActorDTO> actors;
+                _cache.TryGetValue<List<ActorDTO>>("actors", out actors);
+
+                if (actors == null)
+                {
+                    actors = await _movieService.GetActors();
+                    _cache.Set<List<ActorDTO>>("actors", actors, DateTime.Now.AddSeconds(10));
+                }
+                return new OkObjectResult(actors);
             }
-            return actors;
+            catch (Exception ex)
+            {
+                return new StatusCodeResult(500);
+            }
+            
         }
 
         [HttpGet]
         [Route("/actor/{id}")]
-        public async Task<List<Actor>> GetActor(String id)
+        public async Task<ActionResult<List<ActorDTO>>> GetActor(String id)
         {
-            return await _movieService.GetActor(id);
+            try
+            {
+                return await _movieService.GetActor(id);
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult(500);
+            }
         }
 
         [HttpPost]
         [Route("/actor")]
-        public async Task<ActionResult<Actor>> AddActor(Actor actor)
+        public async Task<ActionResult<ActorDTO>> AddActor(ActorDTO actor)
         {
             try
             {
-                return await _movieService.AddActor(actor);
+                return new OkObjectResult(await _movieService.AddActor(actor));
             }
             catch (Exception ex)
             {
@@ -63,25 +95,39 @@ namespace popcorn.Controllers
         #region Movie
         [HttpGet]
         [Route("/movies")]
-        public async Task<List<Movie>> GetMovies()
+        public async Task<ActionResult<List<MovieDTO>>> GetMovies()
         {
-            return await _movieService.GetMovies();
+            try
+            {
+                return new OkObjectResult(await _movieService.GetMovies());
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult(500);
+            }
         }
 
         [HttpGet]
         [Route("/movie/{id}")]
-        public async Task<List<Movie>> GetMovies(String id)
+        public async Task<ActionResult<List<MovieDTO>>> GetMovies(String id)
         {
-            return await _movieService.GetMovie(id);
+            try
+            {
+                return new OkObjectResult(await _movieService.GetMovie(id));
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult(500);
+            }
         }
 
         [HttpPost]
         [Route("/movie")]
-        public async Task<ActionResult<Movie>> AddMovie(Movie movie)
+        public async Task<ActionResult<MovieDTO>> AddMovie(MovieDTO movie)
         {
             try
             {
-                return await _movieService.AddMovie(movie);
+                return new OkObjectResult(await _movieService.AddMovie(movie));
             }
             catch (Exception ex)
             {
@@ -93,18 +139,25 @@ namespace popcorn.Controllers
         #region Torrent
         [HttpGet]
         [Route("/torrent/{id}")]
-        public async Task<List<Torrent>> GetTorrents(String id)
+        public async Task<ActionResult<List<TorrentDTO>>> GetTorrents(String id)
         {
-            return await _movieService.GetTorrent(id);
+            try
+            {
+                return new OkObjectResult(await _movieService.GetTorrent(id));
+            }
+            catch (Exception ex)
+            {
+                return new StatusCodeResult(500);
+            }
         }
 
         [HttpPost]
         [Route("/torrent")]
-        public async Task<ActionResult<Torrent>> AddTorrent(Torrent torrent)
+        public async Task<ActionResult<TorrentDTO>> AddTorrent(TorrentDTO torrent)
         {
             try
             {
-                return await _movieService.AddTorrent(torrent);
+                return new OkObjectResult(await _movieService.AddTorrent(torrent));
             }
             catch (Exception ex)
             {
