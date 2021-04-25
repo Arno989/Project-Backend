@@ -18,8 +18,6 @@ Add logging?
 
 */
 
-
-
 namespace popcorn.Controllers
 {
     [ApiController]
@@ -59,6 +57,7 @@ namespace popcorn.Controllers
             catch (Exception ex)
             {
                 return new StatusCodeResult(500);
+                throw ex;
             }
             
         }
@@ -74,6 +73,7 @@ namespace popcorn.Controllers
             catch (Exception ex)
             {
                 return new StatusCodeResult(500);
+                throw ex;
             }
         }
 
@@ -88,6 +88,7 @@ namespace popcorn.Controllers
             catch (Exception ex)
             {
                 return new StatusCodeResult(500);
+                throw ex;
             }
         }
         #endregion
@@ -104,6 +105,7 @@ namespace popcorn.Controllers
             catch (Exception ex)
             {
                 return new StatusCodeResult(500);
+                throw ex;
             }
         }
 
@@ -118,6 +120,7 @@ namespace popcorn.Controllers
             catch (Exception ex)
             {
                 return new StatusCodeResult(500);
+                throw ex;
             }
         }
 
@@ -132,6 +135,7 @@ namespace popcorn.Controllers
             catch (Exception ex)
             {
                 return new StatusCodeResult(500);
+                throw ex;
             }
         }
         #endregion
@@ -148,6 +152,7 @@ namespace popcorn.Controllers
             catch (Exception ex)
             {
                 return new StatusCodeResult(500);
+                throw ex;
             }
         }
 
@@ -162,6 +167,7 @@ namespace popcorn.Controllers
             catch (Exception ex)
             {
                 return new StatusCodeResult(500);
+                throw ex;
             }
         }
         #endregion
