@@ -4,7 +4,7 @@ namespace popcorn.DTO
 {
     public class TorrentDTO
     {
-        public Guid Id { get; set; }
+        public Guid TorrentId { get; set; }
         public String IMDBMovieId { get; set; }
         public String MagnetLink { get; set; }
         public String Quality { get; set; }

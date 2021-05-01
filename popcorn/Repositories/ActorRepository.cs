@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using popcorn.Data;
@@ -29,7 +30,7 @@ namespace popcorn.Repositories
 
         public async Task<List<Actor>> GetActor(String id)
         {
-            return await _context.Actors.Include(r => r.IMDBActorId == id).ToListAsync();
+            return await _context.Actors.Where(r => r.IMDBActorId == id).ToListAsync();
         }
 
         public async Task<Actor> AddActor(Actor actor)

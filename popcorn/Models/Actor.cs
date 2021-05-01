@@ -10,8 +10,7 @@ namespace popcorn.Models
         public String IMDBActorId { get; set; }
         [Required]
         public String Name { get; set; }
-        [Range(18, 120)]
-        public int Age { get; set; }
-        public List<Movie> Movies { get; set; } // many to many
+        public DateTime Born { get; set; }
+        public List<MovieActor> Movies { get; set; } // many to many
     }
 }

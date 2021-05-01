@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using popcorn.Data;
@@ -10,7 +11,8 @@ namespace popcorn.Repositories
     public interface ITorrentRepository
     {
         Task<Torrent> AddTorrent(Torrent torrent);
-        Task<List<Torrent>> GetTorrent(String id);
+        Task<List<Torrent>> GetTorrent(String movieId);
+        Task<List<Torrent>> GetTorrents();
     }
 
     public class TorrentRepository : ITorrentRepository
@@ -21,9 +23,14 @@ namespace popcorn.Repositories
             _context = context;
         }
 
-        public async Task<List<Torrent>> GetTorrent(String id)
+        public async Task<List<Torrent>> GetTorrents()
         {
-            return await _context.Torrents.Include(r => r.IMDBMovieId == id).ToListAsync();
+            return await _context.Torrents.ToListAsync();
+        }
+
+        public async Task<List<Torrent>> GetTorrent(String movieId)
+        {
+            return await _context.Torrents.Where(r => r.IMDBMovieId == movieId).ToListAsync();
         }
 
         public async Task<Torrent> AddTorrent(Torrent torrent)

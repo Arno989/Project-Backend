@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using popcorn.Data;
@@ -10,7 +11,7 @@ namespace popcorn.Repositories
     public interface IMovieRepository
     {
         Task<Movie> AddMovie(Movie movie);
-        Task<List<Movie>> GetMovie(String id);
+        Task<Movie> GetMovie(string id);
         Task<List<Movie>> GetMovies();
     }
 
@@ -27,9 +28,14 @@ namespace popcorn.Repositories
             return await _context.Movies.ToListAsync();
         }
 
-        public async Task<List<Movie>> GetMovie(String id)
+        public async Task<Movie> GetMovie(String id)
         {
-            return await _context.Movies.Include(r => r.IMDBMovieId == id).ToListAsync();
+            Movie movie =  await _context.Movies.Where(r => r.IMDBMovieId == id)
+            .Include(r => r.Torrents)
+            .Include(r => r.Actors)
+            .Include(r => r.Genres)
+            .SingleOrDefaultAsync();
+            return movie;
         }
 
         public async Task<Movie> AddMovie(Movie movie)

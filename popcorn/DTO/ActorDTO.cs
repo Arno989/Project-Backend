@@ -7,7 +7,7 @@ namespace popcorn.DTO
     {
         public String IMDBActorId { get; set; }
         public String Name { get; set; }
-        public int Age { get; set; }
-        public List<Movie> Movies { get; set; }
+        public DateTime Born { get; set; }
+        public List<String> Movies { get; set; }
     }
 }

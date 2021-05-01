@@ -7,19 +7,20 @@ using popcorn.DTO;
 using popcorn.Models;
 using popcorn.Services;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Authorization;
 
 /* TODO
 
-Add caching to all GET endpoints
-Fix n:n relations
-Add testing
 Add Api security
-Add logging?
+add relations or something with gets
+GET torrent op ID geeft lege lijst
+GET's on ID geen list teruggeven (like movies)
 
 */
 
 namespace popcorn.Controllers
 {
+    // [Authorize]
     [ApiController]
     [Route("api")]
     public class MovieController : ControllerBase
@@ -36,9 +37,10 @@ namespace popcorn.Controllers
             _cache = cache;
         }
 
+
         #region Actor
         [HttpGet]
-        [Route("/actor")]
+        [Route("actors")]
         [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<List<ActorDTO>>> GetActor()
         {
@@ -54,120 +56,198 @@ namespace popcorn.Controllers
                 }
                 return new OkObjectResult(actors);
             }
-            catch (Exception ex)
+            catch
             {
                 return new StatusCodeResult(500);
-                throw ex;
             }
-            
+
         }
 
         [HttpGet]
-        [Route("/actor/{id}")]
+        [Route("actors/{id}")]
         public async Task<ActionResult<List<ActorDTO>>> GetActor(String id)
         {
             try
             {
                 return await _movieService.GetActor(id);
             }
-            catch (Exception ex)
+            catch
             {
                 return new StatusCodeResult(500);
-                throw ex;
             }
         }
 
         [HttpPost]
-        [Route("/actor")]
+        [Route("actors")]
         public async Task<ActionResult<ActorDTO>> AddActor(ActorDTO actor)
         {
             try
             {
                 return new OkObjectResult(await _movieService.AddActor(actor));
             }
-            catch (Exception ex)
+            catch
             {
                 return new StatusCodeResult(500);
-                throw ex;
+            }
+        }
+        #endregion
+
+        #region Genre
+        [HttpGet]
+        [Route("genres")]
+        [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
+        public async Task<ActionResult<List<GenreDTO>>> GetGenre()
+        {
+            try
+            {
+                List<GenreDTO> genres;
+                _cache.TryGetValue<List<GenreDTO>>("genres", out genres);
+
+                if (genres == null)
+                {
+                    genres = await _movieService.GetGenres();
+                    _cache.Set<List<GenreDTO>>("genres", genres, DateTime.Now.AddSeconds(10));
+                }
+                return new OkObjectResult(genres);
+            }
+            catch
+            {
+                return new StatusCodeResult(500);
+            }
+            
+        }
+
+        [HttpGet]
+        [Route("genres/{id}")]
+        public async Task<ActionResult<List<GenreDTO>>> GetGenre(Guid id)
+        {
+            try
+            {
+                return await _movieService.GetGenre(id);
+            }
+            catch
+            {
+                return new StatusCodeResult(500);
+            }
+        }
+
+        [HttpPost]
+        [Route("genres")]
+        public async Task<ActionResult<GenreDTO>> AddGenre(GenreDTO genre)
+        {
+            try
+            {
+                return new OkObjectResult(await _movieService.AddGenre(genre));
+            }
+            catch
+            {
+                return new StatusCodeResult(500);
             }
         }
         #endregion
 
         #region Movie
         [HttpGet]
-        [Route("/movies")]
+        [Route("movies")]
+        [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<List<MovieDTO>>> GetMovies()
         {
             try
             {
-                return new OkObjectResult(await _movieService.GetMovies());
+                List<MovieDTO> movie;
+                _cache.TryGetValue<List<MovieDTO>>("movie", out movie);
+
+                if (movie == null)
+                {
+                    movie = await _movieService.GetMovies();
+                    _cache.Set<List<MovieDTO>>("movie", movie, DateTime.Now.AddSeconds(10));
+                }
+                return new OkObjectResult(movie);
             }
-            catch (Exception ex)
+            catch
             {
                 return new StatusCodeResult(500);
-                throw ex;
             }
         }
 
         [HttpGet]
-        [Route("/movie/{id}")]
-        public async Task<ActionResult<List<MovieDTO>>> GetMovies(String id)
+        [Route("movies/{id}")]
+        public async Task<ActionResult<MovieDTO>> GetMovie(String id)
         {
             try
             {
                 return new OkObjectResult(await _movieService.GetMovie(id));
             }
-            catch (Exception ex)
+            catch
             {
                 return new StatusCodeResult(500);
-                throw ex;
             }
         }
 
         [HttpPost]
-        [Route("/movie")]
+        [Route("movies")]
         public async Task<ActionResult<MovieDTO>> AddMovie(MovieDTO movie)
         {
             try
             {
                 return new OkObjectResult(await _movieService.AddMovie(movie));
             }
-            catch (Exception ex)
+            catch
             {
                 return new StatusCodeResult(500);
-                throw ex;
             }
         }
         #endregion
 
         #region Torrent
         [HttpGet]
-        [Route("/torrent/{id}")]
-        public async Task<ActionResult<List<TorrentDTO>>> GetTorrents(String id)
+        [Route("torrents")]
+        [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
+        public async Task<ActionResult<List<TorrentDTO>>> GetTorrents()
         {
             try
             {
-                return new OkObjectResult(await _movieService.GetTorrent(id));
+                List<TorrentDTO> torrent;
+                _cache.TryGetValue<List<TorrentDTO>>("torrent", out torrent);
+
+                if (torrent == null)
+                {
+                    torrent = await _movieService.GetTorrents();
+                    _cache.Set<List<TorrentDTO>>("torrent", torrent, DateTime.Now.AddSeconds(10));
+                }
+                return new OkObjectResult(torrent);
             }
-            catch (Exception ex)
+            catch
             {
                 return new StatusCodeResult(500);
-                throw ex;
+            }
+        }
+
+        [HttpGet]
+        [Route("torrents/{id}")]
+        public async Task<ActionResult<List<TorrentDTO>>> GetTorrents(String movieId)
+        {
+            try
+            {
+                return new OkObjectResult(await _movieService.GetTorrent(movieId));
+            }
+            catch
+            {
+                return new StatusCodeResult(500);
             }
         }
 
         [HttpPost]
-        [Route("/torrent")]
+        [Route("torrents")]
         public async Task<ActionResult<TorrentDTO>> AddTorrent(TorrentDTO torrent)
         {
             try
             {
                 return new OkObjectResult(await _movieService.AddTorrent(torrent));
             }
-            catch (Exception ex)
+            catch
             {
                 return new StatusCodeResult(500);
-                throw ex;
             }
         }
         #endregion

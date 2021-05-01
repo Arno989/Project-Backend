@@ -396,3 +396,4 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/code,dotenv,dotnetcore,visualstudio,visualstudiocode
 **/db
 **/Migrations
+**/.vscode

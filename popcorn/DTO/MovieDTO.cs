@@ -12,7 +12,7 @@ namespace popcorn.DTO
         public String Synopsis { get; set; }
         public List<String> Genres { get; set; }
         public double Rating { get; set; }
-        public List<Actor> Actors { get; set; }
-        public List<Torrent> Torrents { get; set; }
+        public List<String> Actors { get; set; }
+        public List<Guid> Torrents { get; set; }
     }
 }

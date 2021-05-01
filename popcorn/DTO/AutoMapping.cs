@@ -12,6 +12,8 @@ namespace popcorn.DTO
 
             CreateMap<Actor, ActorDTO>();
             CreateMap<ActorDTO, Actor>();
+            CreateMap<Genre, GenreDTO>();
+            CreateMap<GenreDTO, Genre>();
             CreateMap<Movie, MovieDTO>();
             CreateMap<MovieDTO, Movie>();
             CreateMap<Torrent, TorrentDTO>();

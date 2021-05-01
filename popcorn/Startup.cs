@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -40,10 +41,20 @@ namespace popcorn
             services.AddDbContext<MovieContext>();
 
             services.AddControllers();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = "https://dev-0q9d0sfz.eu.auth0.com/";
+                options.Audience = "http://popcornAPI";
+            });
 
             services.AddTransient<IMovieContext, MovieContext>();
 
             services.AddTransient<IActorRepository, ActorRepository>();
+            services.AddTransient<IGenreRepository, GenreRepository>();
             services.AddTransient<IMovieRepository, MovieRepository>();
             services.AddTransient<ITorrentRepository, TorrentRepository>();
 
@@ -69,7 +80,7 @@ namespace popcorn
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseResponseCaching();

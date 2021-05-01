@@ -7,7 +7,7 @@ namespace popcorn.Models
     public class Torrent
     {
         [Key]
-        public Guid Id { get; set; }
+        public Guid TorrentId { get; set; }
         [Required]
         public String IMDBMovieId { get; set; }
         public String MagnetLink { get; set; }

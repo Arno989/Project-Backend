@@ -13,9 +13,9 @@ namespace popcorn.Models
         public int Runtime { get; set; }
         public DateTime ReleaseDate { get; set; }
         public String Synopsis { get; set; }
-        public List<String> Genres { get; set; } // many to many
+        public List<MovieGenre> Genres { get; set; } // many to many
         public double Rating { get; set; }
-        public List<Actor> Actors { get; set; } // many to many
+        public List<MovieActor> Actors { get; set; } // many to many
         public List<Torrent> Torrents { get; set; }
     }
 }
