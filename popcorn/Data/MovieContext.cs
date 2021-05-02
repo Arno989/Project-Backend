@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using popcorn.Configuration;
 using popcorn.Models;
@@ -38,16 +39,43 @@ namespace popcorn.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
+            options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddDebug()));
             options.UseSqlServer(_connectionStrings.SQL);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Guid tempGuidDrama = Guid.NewGuid();
-            Guid tempGuidAction = Guid.NewGuid();
-            Guid tempGuidSciFi = Guid.NewGuid();
-            Guid tempGuidThriller = Guid.NewGuid();
+            modelBuilder.Entity<MovieGenre>()
+                .HasKey(mg => new { mg.IMDBMovieId, mg.GenreId });
+            modelBuilder.Entity<MovieGenre>()
+                .HasOne(mg => mg.Movie)
+                .WithMany(m => m.MovieGenres)
+                .HasForeignKey(mg => mg.IMDBMovieId);
+            modelBuilder.Entity<MovieGenre>()
+                .HasOne(mg => mg.Genre)
+                .WithMany(g => g.MovieGenres)
+                .HasForeignKey(mg => mg.GenreId);
 
+
+            modelBuilder.Entity<MovieActor>()
+                .HasKey(ma => new { ma.IMDBMovieId, ma.IMDBActorId });
+            modelBuilder.Entity<MovieActor>()
+                .HasOne(ma => ma.Movie)
+                .WithMany(m => m.MovieActors)
+                .HasForeignKey(ma => ma.IMDBMovieId);
+            modelBuilder.Entity<MovieActor>()
+                .HasOne(ma => ma.Actor)
+                .WithMany(a => a.MovieActors)
+                .HasForeignKey(ma => ma.IMDBActorId);
+
+
+            modelBuilder.Entity<Movie>()
+                .HasMany(m => m.Torrents)
+                .WithOne(t => t.Movie)
+                .HasForeignKey(t => t.IMDBMovieId);
+
+
+            #region Actor
             modelBuilder.Entity<Actor>().HasData(new Actor()
             {
                 IMDBActorId = "nm0000151",
@@ -68,19 +96,21 @@ namespace popcorn.Data
                 Name = "Scarlett Johansson",
                 Born = new DateTime(1984, 11, 22)
             });
+            #endregion
 
-
-            modelBuilder.Entity<Movie>().HasData(new Movie()
+            #region Movie
+            Movie movie1 = new Movie()
             {
                 IMDBMovieId = "tt0111161",
                 Name = "The Shawshank Redemption",
                 Runtime = 142,
                 ReleaseDate = new DateTime(1994, 10, 14),
                 Synopsis = "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-                Rating = 9.3
-            });
+                Rating = 9.3,
 
-            modelBuilder.Entity<Movie>().HasData(new Movie()
+            };
+
+            Movie movie2 = new Movie()
             {
                 IMDBMovieId = "tt2872732",
                 Name = "Lucy",
@@ -88,12 +118,16 @@ namespace popcorn.Data
                 ReleaseDate = new DateTime(2014, 7, 25),
                 Synopsis = "A woman, accidentally caught in a dark deal, turns the tables on her captors and transforms into a merciless warrior evolved beyond human logic.",
                 Rating = 6.4
-            });
+            };
 
+            modelBuilder.Entity<Movie>().HasData(movie1, movie2);
+            #endregion
 
+            #region Torrent
             modelBuilder.Entity<Torrent>().HasData(new Torrent()
             {
                 TorrentId = Guid.NewGuid(),
+                // Movie = movie1,
                 IMDBMovieId = "tt0111161",
                 MagnetLink = "https://yts.mx/torrent/download/E0D00667650ABA9EE05AACBBBD8B55EA8A51F534",
                 Quality = "1080p",
@@ -105,6 +139,7 @@ namespace popcorn.Data
             modelBuilder.Entity<Torrent>().HasData(new Torrent()
             {
                 TorrentId = Guid.NewGuid(),
+                // Movie = movie2,
                 IMDBMovieId = "tt2872732",
                 MagnetLink = "https://yts.mx/torrent/download/D421A1EFA2A8231F4FC1EABC69C5B64F8E823F71",
                 Quality = "1080p",
@@ -116,6 +151,7 @@ namespace popcorn.Data
             modelBuilder.Entity<Torrent>().HasData(new Torrent()
             {
                 TorrentId = Guid.NewGuid(),
+                // Movie = movie2,
                 IMDBMovieId = "tt2872732",
                 MagnetLink = "https://yts.mx/torrent/download/EA20559FAD8179E5468EF5B7752553D8A0D62CDE",
                 Quality = "720p",
@@ -123,6 +159,13 @@ namespace popcorn.Data
                 Peers = 23,
                 FileSize = "785Mb"
             });
+            #endregion
+
+            #region Genre
+            Guid tempGuidDrama = Guid.NewGuid();
+            Guid tempGuidAction = Guid.NewGuid();
+            Guid tempGuidSciFi = Guid.NewGuid();
+            Guid tempGuidThriller = Guid.NewGuid();
 
             modelBuilder.Entity<Genre>().HasData(new Genre()
             {
@@ -147,10 +190,9 @@ namespace popcorn.Data
                 GenreId = tempGuidThriller,
                 Name = "Thriller",
             });
+            #endregion
 
-
-            modelBuilder.Entity<MovieGenre>().HasKey(cs => new { cs.IMDBMovieId, cs.GenreId });
-
+            #region Many to Many
             modelBuilder.Entity<MovieGenre>().HasData(new MovieGenre()
             {
                 IMDBMovieId = "tt0111161",
@@ -176,8 +218,6 @@ namespace popcorn.Data
             });
 
 
-            modelBuilder.Entity<MovieActor>().HasKey(cs => new { cs.IMDBMovieId, cs.IMDBActorId });
-
             modelBuilder.Entity<MovieActor>().HasData(new MovieActor()
             {
                 IMDBMovieId = "tt2872732",
@@ -201,6 +241,7 @@ namespace popcorn.Data
                 IMDBMovieId = "tt0111161",
                 IMDBActorId = "nm0000209",
             });
+            #endregion
         }
     }
 }

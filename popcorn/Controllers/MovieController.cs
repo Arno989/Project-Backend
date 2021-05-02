@@ -9,18 +9,11 @@ using popcorn.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Authorization;
 
-/* TODO
-
-Add Api security
-add relations or something with gets
-GET torrent op ID geeft lege lijst
-GET's on ID geen list teruggeven (like movies)
-
-*/
-
 namespace popcorn.Controllers
 {
-    // [Authorize]
+    // https://manage.auth0.com/dashboard/eu/dev-0q9d0sfz/apis/608d79dff9b1e30045d92869/test
+
+    [Authorize]
     [ApiController]
     [Route("api")]
     public class MovieController : ControllerBase
@@ -40,19 +33,20 @@ namespace popcorn.Controllers
 
         #region Actor
         [HttpGet]
+        [AllowAnonymous]
         [Route("actors")]
         [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
-        public async Task<ActionResult<List<ActorDTO>>> GetActor()
+        public async Task<ActionResult<List<ExtendedActorDTO>>> GetActor()
         {
             try
             {
-                List<ActorDTO> actors;
-                _cache.TryGetValue<List<ActorDTO>>("actors", out actors);
+                List<ExtendedActorDTO> actors;
+                _cache.TryGetValue<List<ExtendedActorDTO>>("actors", out actors);
 
                 if (actors == null)
                 {
                     actors = await _movieService.GetActors();
-                    _cache.Set<List<ActorDTO>>("actors", actors, DateTime.Now.AddSeconds(10));
+                    _cache.Set<List<ExtendedActorDTO>>("actors", actors, DateTime.Now.AddSeconds(10));
                 }
                 return new OkObjectResult(actors);
             }
@@ -64,8 +58,9 @@ namespace popcorn.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("actors/{id}")]
-        public async Task<ActionResult<List<ActorDTO>>> GetActor(String id)
+        public async Task<ActionResult<ExtendedActorDTO>> GetActor(String id)
         {
             try
             {
@@ -78,8 +73,9 @@ namespace popcorn.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("actors")]
-        public async Task<ActionResult<ActorDTO>> AddActor(ActorDTO actor)
+        public async Task<ActionResult<ExtendedActorDTO>> AddActor(ExtendedActorDTO actor)
         {
             try
             {
@@ -94,6 +90,7 @@ namespace popcorn.Controllers
 
         #region Genre
         [HttpGet]
+        [AllowAnonymous]
         [Route("genres")]
         [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<List<GenreDTO>>> GetGenre()
@@ -118,8 +115,9 @@ namespace popcorn.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("genres/{id}")]
-        public async Task<ActionResult<List<GenreDTO>>> GetGenre(Guid id)
+        public async Task<ActionResult<GenreDTO>> GetGenre(Guid id)
         {
             try
             {
@@ -132,6 +130,7 @@ namespace popcorn.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("genres")]
         public async Task<ActionResult<GenreDTO>> AddGenre(GenreDTO genre)
         {
@@ -148,19 +147,20 @@ namespace popcorn.Controllers
 
         #region Movie
         [HttpGet]
+        [AllowAnonymous]
         [Route("movies")]
         [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
-        public async Task<ActionResult<List<MovieDTO>>> GetMovies()
+        public async Task<ActionResult<List<ExtendedMovieDTO>>> GetMovies()
         {
             try
             {
-                List<MovieDTO> movie;
-                _cache.TryGetValue<List<MovieDTO>>("movie", out movie);
+                List<ExtendedMovieDTO> movie;
+                _cache.TryGetValue<List<ExtendedMovieDTO>>("movie", out movie);
 
                 if (movie == null)
                 {
                     movie = await _movieService.GetMovies();
-                    _cache.Set<List<MovieDTO>>("movie", movie, DateTime.Now.AddSeconds(10));
+                    _cache.Set<List<ExtendedMovieDTO>>("movie", movie, DateTime.Now.AddSeconds(10));
                 }
                 return new OkObjectResult(movie);
             }
@@ -171,8 +171,9 @@ namespace popcorn.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("movies/{id}")]
-        public async Task<ActionResult<MovieDTO>> GetMovie(String id)
+        public async Task<ActionResult<ExtendedMovieDTO>> GetMovie(String id)
         {
             try
             {
@@ -185,8 +186,9 @@ namespace popcorn.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("movies")]
-        public async Task<ActionResult<MovieDTO>> AddMovie(MovieDTO movie)
+        public async Task<ActionResult<ExtendedMovieDTO>> AddMovie(ExtendedMovieDTO movie)
         {
             try
             {
@@ -202,6 +204,7 @@ namespace popcorn.Controllers
         #region Torrent
         [HttpGet]
         [Route("torrents")]
+        [AllowAnonymous] // yeet dis
         [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<List<TorrentDTO>>> GetTorrents()
         {
@@ -224,12 +227,13 @@ namespace popcorn.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("torrents/{id}")]
-        public async Task<ActionResult<List<TorrentDTO>>> GetTorrents(String movieId)
+        public async Task<ActionResult<List<TorrentDTO>>> GetTorrents(String id)
         {
             try
             {
-                return new OkObjectResult(await _movieService.GetTorrent(movieId));
+                return new OkObjectResult(await _movieService.GetTorrent(id));
             }
             catch
             {
@@ -238,6 +242,7 @@ namespace popcorn.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous] // yeet dis
         [Route("torrents")]
         public async Task<ActionResult<TorrentDTO>> AddTorrent(TorrentDTO torrent)
         {

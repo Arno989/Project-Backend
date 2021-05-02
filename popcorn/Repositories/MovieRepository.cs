@@ -25,16 +25,21 @@ namespace popcorn.Repositories
 
         public async Task<List<Movie>> GetMovies()
         {
-            return await _context.Movies.ToListAsync();
+            return await _context.Movies
+                .Include(m => m.MovieActors).ThenInclude(ma => ma.Actor)
+                .Include(m => m.MovieGenres).ThenInclude(mg => mg.Genre)
+                .ToListAsync();
         }
 
         public async Task<Movie> GetMovie(String id)
         {
-            Movie movie =  await _context.Movies.Where(r => r.IMDBMovieId == id)
-            .Include(r => r.Torrents)
-            .Include(r => r.Actors)
-            .Include(r => r.Genres)
-            .SingleOrDefaultAsync();
+            Movie movie =  await _context.Movies
+                .Where(m => m.IMDBMovieId == id)
+                .Include(m => m.MovieActors).ThenInclude(ma => ma.Actor)
+                .Include(m => m.MovieGenres).ThenInclude(mg => mg.Genre)
+                .Include(m => m.Torrents)
+                .SingleOrDefaultAsync();
+                
             return movie;
         }
 

@@ -3,11 +3,15 @@ using System.Collections.Generic;
 
 namespace popcorn.DTO
 {
-    public class ActorDTO
+    public class CoreActorDTO
     {
         public String IMDBActorId { get; set; }
         public String Name { get; set; }
         public DateTime Born { get; set; }
-        public List<String> Movies { get; set; }
+    }
+
+    public class ExtendedActorDTO : CoreActorDTO
+    {
+        public ICollection<CoreMovieDTO> Movies { get; set; }
     }
 }

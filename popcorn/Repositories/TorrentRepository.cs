@@ -28,9 +28,9 @@ namespace popcorn.Repositories
             return await _context.Torrents.ToListAsync();
         }
 
-        public async Task<List<Torrent>> GetTorrent(String movieId)
+        public async Task<List<Torrent>> GetTorrent(String id)
         {
-            return await _context.Torrents.Where(r => r.IMDBMovieId == movieId).ToListAsync();
+            return await _context.Torrents.Where(r => r.IMDBMovieId == id).ToListAsync();
         }
 
         public async Task<Torrent> AddTorrent(Torrent torrent)

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using popcorn.DTO;
 using popcorn.Models;
+using RestSharp;
 using Xunit;
 
 namespace popcorn.test
@@ -21,6 +22,7 @@ namespace popcorn.test
         {
             Client = fixture.CreateClient();
         }
+        
 
         #region Actor
         [Fact]
@@ -29,7 +31,7 @@ namespace popcorn.test
             var response = await Client.GetAsync("/api/actors");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var actors = JsonConvert.DeserializeObject<List<ActorDTO>>(await response.Content.ReadAsStringAsync());
+            var actors = JsonConvert.DeserializeObject<List<ExtendedActorDTO>>(await response.Content.ReadAsStringAsync());
             Assert.True(actors.Count > 0);
         }
         [Fact]
@@ -38,14 +40,14 @@ namespace popcorn.test
             var response = await Client.GetAsync("/api/actors/nm0424060");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var actors = JsonConvert.DeserializeObject<List<ActorDTO>>(await response.Content.ReadAsStringAsync());
-            Assert.True(actors.Count == 1);
+            var actor = JsonConvert.DeserializeObject<ExtendedActorDTO>(await response.Content.ReadAsStringAsync());
+            Assert.Equal("nm0424060", actor.IMDBActorId);
         }
 
         [Fact]
         public async Task Add_Actor()
         {
-            var actor = new ActorDTO()
+            var actor = new ExtendedActorDTO()
             {
                 IMDBActorId = "nm0001618",
                 Name = "Joaquin Phoenix",
@@ -56,7 +58,7 @@ namespace popcorn.test
             var response = await Client.PostAsync("/api/actors", new StringContent(json, Encoding.UTF8, "application/json"));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var createdActor = JsonConvert.DeserializeObject<ActorDTO>(await response.Content.ReadAsStringAsync());
+            var createdActor = JsonConvert.DeserializeObject<ExtendedActorDTO>(await response.Content.ReadAsStringAsync());
             Assert.NotNull(createdActor);
         }
         #endregion
@@ -71,14 +73,25 @@ namespace popcorn.test
             var genres = JsonConvert.DeserializeObject<List<GenreDTO>>(await response.Content.ReadAsStringAsync());
             Assert.True(genres.Count > 0);
         }
+
         [Fact]
         public async Task Get_Genre()
         {
-            var response = await Client.GetAsync("/api/genres/fa3599f5-af78-40f1-ab9c-c2921d40e02d");
+            var genre = new GenreDTO()
+            {
+                GenreId = Guid.NewGuid(),
+                Name = "LGBTQ+"
+            };
+
+            string json = JsonConvert.SerializeObject(genre);
+            var postResponse = await Client.PostAsync("/api/genres", new StringContent(json, Encoding.UTF8, "application/json"));
+            var createdGenre = JsonConvert.DeserializeObject<GenreDTO>(await postResponse.Content.ReadAsStringAsync());
+
+            var response = await Client.GetAsync($"/api/genres/{createdGenre.GenreId}");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var genres = JsonConvert.DeserializeObject<List<GenreDTO>>(await response.Content.ReadAsStringAsync());
-            Assert.True(genres.Count == 1);
+            var checkGenre = JsonConvert.DeserializeObject<GenreDTO>(await response.Content.ReadAsStringAsync());
+            Assert.Equal(genre.GenreId , checkGenre.GenreId);
         }
 
         [Fact]
@@ -106,7 +119,7 @@ namespace popcorn.test
             var response = await Client.GetAsync("/api/movies");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var movies = JsonConvert.DeserializeObject<List<MovieDTO>>(await response.Content.ReadAsStringAsync());
+            var movies = JsonConvert.DeserializeObject<List<ExtendedMovieDTO>>(await response.Content.ReadAsStringAsync());
             Assert.True(movies.Count > 0);
         }
         [Fact]
@@ -115,14 +128,14 @@ namespace popcorn.test
             var response = await Client.GetAsync("/api/movies/tt2872732");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var movies = JsonConvert.DeserializeObject<List<MovieDTO>>(await response.Content.ReadAsStringAsync());
-            Assert.True(movies.Count == 1);
+            var movie = JsonConvert.DeserializeObject<ExtendedMovieDTO>(await response.Content.ReadAsStringAsync());
+            Assert.Equal("tt2872732", movie.IMDBMovieId);
         }
 
         [Fact]
         public async Task Add_Movie()
         {
-            var movie = new MovieDTO()
+            var movie = new ExtendedMovieDTO()
             {
                 IMDBMovieId = "tt1798709",
                 Name = "Her",
@@ -136,7 +149,7 @@ namespace popcorn.test
             var response = await Client.PostAsync("/api/movies", new StringContent(json, Encoding.UTF8, "application/json"));
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var createdMovie = JsonConvert.DeserializeObject<MovieDTO>(await response.Content.ReadAsStringAsync()); 
+            var createdMovie = JsonConvert.DeserializeObject<ExtendedMovieDTO>(await response.Content.ReadAsStringAsync()); 
             Assert.NotNull(createdMovie);
         }
         #endregion
@@ -149,16 +162,16 @@ namespace popcorn.test
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var torrents = JsonConvert.DeserializeObject<List<TorrentDTO>>(await response.Content.ReadAsStringAsync());
-            Assert.True(torrents.Count > 0);
+            Assert.NotEmpty(torrents);
         }
         [Fact]
         public async Task Get_Torrent()
         {
-            var response = await Client.GetAsync("/api/torrents/tt1798709");
+            var response = await Client.GetAsync("/api/torrents/tt2872732");
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var torrents = JsonConvert.DeserializeObject<List<TorrentDTO>>(await response.Content.ReadAsStringAsync());
-            Assert.True(torrents.Count == 1);
+            Assert.NotEmpty(torrents);
         }
 
         [Fact]
@@ -167,7 +180,7 @@ namespace popcorn.test
             var torrent = new TorrentDTO()
             {
                 TorrentId = Guid.NewGuid(),
-                IMDBMovieId = "tt1798709",
+                IMDBMovieId = "tt2872732",
                 MagnetLink = "http://yts.ge/torrent/download/Her%20(2013)%20%5b1080p%5d%20%5bBluRay%5d%20%5bYTS.MX%5d.torrent",
                 Quality = "1080p",
                 Seeds = 85,

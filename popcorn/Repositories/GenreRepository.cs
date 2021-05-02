@@ -11,7 +11,7 @@ namespace popcorn.Repositories
     public interface IGenreRepository
     {
         Task<Genre> AddGenre(Genre genre);
-        Task<List<Genre>> GetGenre(Guid id);
+        Task<Genre> GetGenre(Guid id);
         Task<List<Genre>> GetGenres();
     }
 
@@ -28,9 +28,9 @@ namespace popcorn.Repositories
             return await _context.Genres.ToListAsync();
         }
 
-        public async Task<List<Genre>> GetGenre(Guid id)
+        public async Task<Genre> GetGenre(Guid id)
         {
-            return await _context.Genres.Where(r => r.GenreId == id).ToListAsync(); //.SingleOrDefaultAsync();
+            return await _context.Genres.Where(r => r.GenreId == id).SingleOrDefaultAsync();
         }
 
         public async Task<Genre> AddGenre(Genre genre)

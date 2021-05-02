@@ -11,7 +11,7 @@ namespace popcorn.Repositories
     public interface IActorRepository
     {
         Task<Actor> AddActor(Actor actor);
-        Task<List<Actor>> GetActor(String id);
+        Task<Actor> GetActor(String id);
         Task<List<Actor>> GetActors();
     }
 
@@ -25,12 +25,17 @@ namespace popcorn.Repositories
 
         public async Task<List<Actor>> GetActors()
         {
-            return await _context.Actors.ToListAsync();
+            return await _context.Actors
+                .Include(a => a.MovieActors).ThenInclude(ma => ma.Movie)
+                .ToListAsync();
         }
 
-        public async Task<List<Actor>> GetActor(String id)
+        public async Task<Actor> GetActor(String id)
         {
-            return await _context.Actors.Where(r => r.IMDBActorId == id).ToListAsync();
+            return await _context.Actors
+                .Where(a => a.IMDBActorId == id)
+                .Include(a => a.MovieActors).ThenInclude(ma => ma.Movie)
+                .SingleOrDefaultAsync();
         }
 
         public async Task<Actor> AddActor(Actor actor)

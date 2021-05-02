@@ -10,17 +10,17 @@ namespace popcorn.Services
 {
     public interface IMovieService
     {
-        Task<ActorDTO> AddActor(ActorDTO actor);
+        Task<ExtendedActorDTO> AddActor(ExtendedActorDTO actor);
         Task<GenreDTO> AddGenre(GenreDTO Genre);
-        Task<MovieDTO> AddMovie(MovieDTO movie);
+        Task<ExtendedMovieDTO> AddMovie(ExtendedMovieDTO movie);
         Task<TorrentDTO> AddTorrent(TorrentDTO torrent);
-        Task<List<ActorDTO>> GetActor(string id);
-        Task<List<ActorDTO>> GetActors();
-        Task<List<GenreDTO>> GetGenre(Guid id);
+        Task<ExtendedActorDTO> GetActor(string id);
+        Task<List<ExtendedActorDTO>> GetActors();
+        Task<GenreDTO> GetGenre(Guid id);
         Task<List<GenreDTO>> GetGenres();
-        Task<MovieDTO> GetMovie(string id);
-        Task<List<MovieDTO>> GetMovies();
-        Task<List<TorrentDTO>> GetTorrent(string movieId);
+        Task<ExtendedMovieDTO> GetMovie(string id);
+        Task<List<ExtendedMovieDTO>> GetMovies();
+        Task<List<TorrentDTO>> GetTorrent(string id);
         Task<List<TorrentDTO>> GetTorrents();
     }
 
@@ -47,17 +47,17 @@ namespace popcorn.Services
         }
 
         #region Actor
-        public async Task<List<ActorDTO>> GetActors()
+        public async Task<List<ExtendedActorDTO>> GetActors()
         {
-            return _mapper.Map<List<ActorDTO>>(await _actorRepository.GetActors());
+            return _mapper.Map<List<ExtendedActorDTO>>(await _actorRepository.GetActors());
         }
 
-        public async Task<List<ActorDTO>> GetActor(String id)
+        public async Task<ExtendedActorDTO> GetActor(String id)
         {
-            return _mapper.Map<List<ActorDTO>>(await _actorRepository.GetActor(id));
+            return _mapper.Map<ExtendedActorDTO>(await _actorRepository.GetActor(id));
         }
 
-        public async Task<ActorDTO> AddActor(ActorDTO actor)
+        public async Task<ExtendedActorDTO> AddActor(ExtendedActorDTO actor)
         {
             Actor newActor = _mapper.Map<Actor>(actor);
             await _actorRepository.AddActor(newActor);
@@ -71,9 +71,9 @@ namespace popcorn.Services
             return _mapper.Map<List<GenreDTO>>(await _genreRepository.GetGenres());
         }
 
-        public async Task<List<GenreDTO>> GetGenre(Guid id)
+        public async Task<GenreDTO> GetGenre(Guid id)
         {
-            return _mapper.Map<List<GenreDTO>>(await _genreRepository.GetGenre(id));
+            return _mapper.Map<GenreDTO>(await _genreRepository.GetGenre(id));
         }
 
         public async Task<GenreDTO> AddGenre(GenreDTO Genre)
@@ -85,17 +85,17 @@ namespace popcorn.Services
         #endregion
 
         #region Movie
-        public async Task<List<MovieDTO>> GetMovies()
+        public async Task<List<ExtendedMovieDTO>> GetMovies()
         {
-            return _mapper.Map<List<MovieDTO>>(await _movieRepository.GetMovies());
+            return _mapper.Map<List<ExtendedMovieDTO>>(await _movieRepository.GetMovies());
         }
 
-        public async Task<MovieDTO> GetMovie(String id)
+        public async Task<ExtendedMovieDTO> GetMovie(String id)
         {
-            return _mapper.Map<MovieDTO>(await _movieRepository.GetMovie(id));
+            return _mapper.Map<ExtendedMovieDTO>(await _movieRepository.GetMovie(id));
         }
 
-        public async Task<MovieDTO> AddMovie(MovieDTO movie)
+        public async Task<ExtendedMovieDTO> AddMovie(ExtendedMovieDTO movie)
         {
             Movie newMovie = _mapper.Map<Movie>(movie);
             await _movieRepository.AddMovie(newMovie);
@@ -109,9 +109,9 @@ namespace popcorn.Services
             return _mapper.Map<List<TorrentDTO>>(await _torrentRepository.GetTorrents());
         }
 
-        public async Task<List<TorrentDTO>> GetTorrent(String movieId)
+        public async Task<List<TorrentDTO>> GetTorrent(String id)
         {
-            return _mapper.Map<List<TorrentDTO>>(await _torrentRepository.GetTorrent(movieId));
+            return _mapper.Map<List<TorrentDTO>>(await _torrentRepository.GetTorrent(id));
         }
 
         public async Task<TorrentDTO> AddTorrent(TorrentDTO torrent)

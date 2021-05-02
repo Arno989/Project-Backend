@@ -1,18 +1,23 @@
 using System;
 using System.Collections.Generic;
+using popcorn.Models;
 
 namespace popcorn.DTO
 {
-    public class MovieDTO
+    public class CoreMovieDTO
     {
         public String IMDBMovieId { get; set; }
         public String Name { get; set; }
         public int Runtime { get; set; }
         public DateTime ReleaseDate { get; set; }
         public String Synopsis { get; set; }
-        public List<String> Genres { get; set; }
         public double Rating { get; set; }
-        public List<String> Actors { get; set; }
-        public List<Guid> Torrents { get; set; }
+        public ICollection<TorrentDTO> Torrents { get; set; }
+    }
+
+    public class ExtendedMovieDTO : CoreMovieDTO
+    {
+        public ICollection<GenreDTO> Genres { get; set; }
+        public ICollection<CoreActorDTO> Actors { get; set; }
     }
 }

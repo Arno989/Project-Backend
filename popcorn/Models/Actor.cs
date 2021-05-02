@@ -11,6 +11,6 @@ namespace popcorn.Models
         [Required]
         public String Name { get; set; }
         public DateTime Born { get; set; }
-        public List<MovieActor> Movies { get; set; } // many to many
+        public ICollection<MovieActor> MovieActors { get; set; }
     }
 }
