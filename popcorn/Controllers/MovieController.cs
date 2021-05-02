@@ -73,7 +73,7 @@ namespace popcorn.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        // [AllowAnonymous] // yeet dis
         [Route("actors")]
         public async Task<ActionResult<ExtendedActorDTO>> AddActor(ExtendedActorDTO actor)
         {
@@ -130,7 +130,7 @@ namespace popcorn.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        // [AllowAnonymous] // yeet dis
         [Route("genres")]
         public async Task<ActionResult<GenreDTO>> AddGenre(GenreDTO genre)
         {
@@ -186,7 +186,7 @@ namespace popcorn.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        // [AllowAnonymous] // yeet dis
         [Route("movies")]
         public async Task<ActionResult<ExtendedMovieDTO>> AddMovie(ExtendedMovieDTO movie)
         {
@@ -204,7 +204,7 @@ namespace popcorn.Controllers
         #region Torrent
         [HttpGet]
         [Route("torrents")]
-        [AllowAnonymous] // yeet dis
+        // [AllowAnonymous] // yeet dis
         [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<List<TorrentDTO>>> GetTorrents()
         {
@@ -242,7 +242,7 @@ namespace popcorn.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous] // yeet dis
+        // [AllowAnonymous] // yeet dis
         [Route("torrents")]
         public async Task<ActionResult<TorrentDTO>> AddTorrent(TorrentDTO torrent)
         {
