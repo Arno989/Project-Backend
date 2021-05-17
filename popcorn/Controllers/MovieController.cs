@@ -19,17 +19,36 @@ namespace popcorn.Controllers
     public class MovieController : ControllerBase
     {
         private readonly IMovieService _movieService;
+        private readonly ICalculatorService _calculatorService;
         private readonly IMemoryCache _cache;
         private readonly ILogger<MovieController> _logger;
 
         
-        public MovieController(ILogger<MovieController> logger, IMovieService movieService, IMemoryCache cache)
+        public MovieController(ILogger<MovieController> logger, IMovieService movieService, IMemoryCache cache, ICalculatorService calc)
         {
             _logger = logger;
             _movieService = movieService;
+            _calculatorService = calc;
             _cache = cache;
         }
 
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("add/{n1}/{n2}")]
+        public ActionResult add(int n1, int n2)
+        {
+            try
+            {
+                
+                return new OkObjectResult(_calculatorService.add(n1, n2));
+            }
+            catch
+            {
+                return new StatusCodeResult(500);
+            }
+
+        }
 
         #region Actor
         [HttpGet]

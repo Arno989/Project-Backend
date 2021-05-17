@@ -59,6 +59,7 @@ namespace popcorn
             services.AddTransient<ITorrentRepository, TorrentRepository>();
 
             services.AddTransient<IMovieService, MovieService>();
+            services.AddTransient<ICalculatorService, CalculatorService>();
 
 
             services.AddSwaggerGen(c =>

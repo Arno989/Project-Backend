@@ -47,6 +47,7 @@ namespace popcorn.Services
         }
 
         #region Actor
+        
         public async Task<List<ExtendedActorDTO>> GetActors()
         {
             return _mapper.Map<List<ExtendedActorDTO>>(await _actorRepository.GetActors());
